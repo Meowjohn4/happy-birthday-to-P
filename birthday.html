@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday 🎉</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --bg1:#ff9a9e; --bg2:#fad0c4; --bg3:#fbc2eb; --bg4:#a6c1ee;
+            --accent:#ff4d6d; --gold:#ffd166; --mint:#06d6a0; --blue:#118ab2; --violet:#8338ec;
+        }
+        *{ box-sizing:border-box; }
+        html,body{ height:100%; margin:0; }
+        body{
+            font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+            color:#222;
+            background: linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3),var(--bg4));
+            background-size:300% 300%;
+            animation:bgShift 18s ease infinite;
+            overflow-x:hidden;
+        }
+        @keyframes bgShift{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+        .container{
+            min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+            padding:24px; text-align:center; position:relative;
+        }
+        h1{
+            font-size: clamp(36px, 6vw, 72px);
+            line-height:1.1; margin:0 0 8px; color:#fff; text-shadow:0 6px 20px rgba(0,0,0,.25);
+        }
+        h2{ margin:0 0 24px; font-weight:400; color:#fff; text-shadow:0 4px 16px rgba(0,0,0,.2); }
+
+        .card{
+            background: rgba(255,255,255,.2);
+            backdrop-filter: blur(10px);
+            border:1px solid rgba(255,255,255,.35);
+            border-radius:24px; padding:24px; max-width:840px; width:100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+        }
+
+        .buttons{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:16px; }
+        .btn{
+            appearance:none; border:none; padding:12px 18px; border-radius:14px; cursor:pointer; font-weight:600; color:#fff;
+            box-shadow:0 10px 22px rgba(0,0,0,.18); transform:translateY(0); transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
+        }
+        .btn:hover{ transform:translateY(-2px); filter:brightness(1.05); box-shadow:0 16px 30px rgba(0,0,0,.22); }
+        .btn:active{ transform:translateY(0); }
+        .btn-primary{ background:linear-gradient(135deg,var(--violet),var(--blue)); }
+        .btn-love{ background:linear-gradient(135deg,#ff5f6d,#ffc371); }
+        .btn-wish{ background:linear-gradient(135deg,#00c6ff,#0072ff); }
+        .btn-confetti{ background:linear-gradient(135deg,#43e97b,#38f9d7); color:#083; }
+
+        .hearts{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+        .heart{ position:absolute; width:14px; height:14px; transform:translate(-50%,-50%); animation:float 6s ease-in infinite; }
+        .heart::before, .heart::after{
+            content:""; position:absolute; width:50%; height:80%; background:var(--accent);
+            border-radius:50px 50px 0 0; transform-origin:bottom center;
+        }
+        .heart::before{ left:0; transform:rotate(-45deg); }
+        .heart::after{ right:0; transform:rotate(45deg); }
+        @keyframes float{ 0%{opacity:0; transform:translate(-50%, 10vh) scale(.6) rotate(0);} 10%{opacity:1;} 100%{opacity:0; transform:translate(-50%, -110vh) scale(1.4) rotate(360deg);} }
+
+        .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:1000; }
+        .modal{ width:min(680px, 92vw); background:#fff; border-radius:20px; padding:22px; box-shadow:0 24px 80px rgba(0,0,0,.35); transform:scale(.9); opacity:0; transition:.25s ease; }
+        .modal.open{ transform:scale(1); opacity:1; }
+        .modal-backdrop.show{ display:flex; }
+        .modal header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+        .modal h3{ margin:0; font-size:26px; }
+        .close{ background:transparent; border:none; font-size:22px; cursor:pointer; }
+
+        .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:1200; }
+        .piece{ position:absolute; width:10px; height:16px; opacity:0; animation:fall 3s ease-out forwards; }
+        @keyframes fall{ 0%{ transform:translateY(-10vh) rotate(0); opacity:0;} 10%{opacity:1;} 100%{ transform:translateY(110vh) rotate(720deg); opacity:0; } }
+
+        footer{ margin-top:18px; color:#fff; font-size:14px; opacity:.9; }
+        .name{ color:#fff; font-weight:800; text-shadow:0 4px 18px rgba(0,0,0,.25); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hearts" id="hearts"></div>
+        <h1>สุขสันต์วันเกิด ❤️</h1>
+        <h2>ขอให้ <span class="name" id="receiverName">คนพิเศษของฉัน</span> มีความสุขที่สุดในโลก</h2>
+        <div class="card">
+            <p style="margin:0 0 8px; font-size:18px;">วันนี้เป็นวันของคุณ! กดปุ่มด้านล่างเพื่อรับคำอวยพรสุดพิเศษ</p>
+            <div class="buttons">
+                <button class="btn btn-primary" id="btnOpenWish">เปิดการ์ดอวยพร 🎂</button>
+                <button class="btn btn-love" id="btnLove">บอกรัก 💖</button>
+                <button class="btn btn-wish" id="btnMemory">ความทรงจำดี ๆ ✨</button>
+                <button class="btn btn-confetti" id="btnConfetti">โปรยกระดาษสี 🎊</button>
+            </div>
+        </div>
+        <footer>
+            สร้างด้วยรักและความตั้งใจ — สำหรับ <span class="name" id="footerName">คุณ</span>
+        </footer>
+    </div>
+
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal" id="modal">
+            <header>
+                <h3 id="modalTitle">🎉 สุขสันต์วันเกิด!</h3>
+                <button class="close" id="btnClose">✖</button>
+            </header>
+            <div id="modalContent">
+                <p style="margin:0; font-size:18px;">ขอให้ปีนี้เป็นปีที่ดีที่สุดของคุณ เต็มไปด้วยรอยยิ้ม สุขภาพแข็งแรง และความฝันที่เป็นจริง</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="confetti" id="confetti"></div>
+
+    <script>
+        const heartsRoot = document.getElementById('hearts');
+        const modalBackdrop = document.getElementById('modalBackdrop');
+        const modal = document.getElementById('modal');
+        const btnOpenWish = document.getElementById('btnOpenWish');
+        const btnLove = document.getElementById('btnLove');
+        const btnMemory = document.getElementById('btnMemory');
+        const btnConfetti = document.getElementById('btnConfetti');
+        const btnClose = document.getElementById('btnClose');
+        const confettiRoot = document.getElementById('confetti');
+        const receiverName = document.getElementById('receiverName');
+        const footerName = document.getElementById('footerName');
+
+        const urlParams = new URLSearchParams(location.search);
+        const nameParam = urlParams.get('to') || 'คนพิเศษของฉัน';
+        receiverName.textContent = nameParam;
+        footerName.textContent = nameParam;
+
+        function openModal(title, html){
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalContent').innerHTML = html;
+            modalBackdrop.classList.add('show');
+            requestAnimationFrame(() => modal.classList.add('open'));
+        }
+        function closeModal(){ modal.classList.remove('open'); setTimeout(()=>modalBackdrop.classList.remove('show'), 200); }
+        btnClose.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', (e)=>{ if(e.target===modalBackdrop) closeModal(); });
+
+        function spawnHearts(){
+            const total = 14;
+            for(let i=0;i<total;i++){
+                const h = document.createElement('div');
+                h.className = 'heart';
+                h.style.left = Math.random()*100 + 'vw';
+                h.style.top = (100 + Math.random()*40) + 'vh';
+                h.style.animationDelay = (Math.random()*6) + 's';
+                h.style.filter = `hue-rotate(${Math.random()*60-30}deg)`;
+                heartsRoot.appendChild(h);
+                setTimeout(()=>h.remove(), 8000);
+            }
+        }
+        setInterval(spawnHearts, 1500); spawnHearts();
+
+        function fireConfetti(count=160){
+            const colors=['#ffadad','#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#bdb2ff','#ffc6ff'];
+            for(let i=0;i<count;i++){
+                const p = document.createElement('div');
+                p.className = 'piece';
+                const size = 8 + Math.random()*10;
+                p.style.width = size + 'px';
+                p.style.height = (size*1.4) + 'px';
+                p.style.left = Math.random()*100 + 'vw';
+                p.style.background = colors[i % colors.length];
+                p.style.transform = `translateY(-10vh) rotate(${Math.random()*360}deg)`;
+                p.style.animationDelay = (Math.random()*0.6)+'s';
+                confettiRoot.appendChild(p);
+                setTimeout(()=>p.remove(), 3500);
+            }
+        }
+
+        btnOpenWish.addEventListener('click', ()=>{
+            fireConfetti(200);
+            openModal('🎂 การ์ดอวยพรถึง ' + nameParam, `
+                <div style="display:grid; gap:8px;">
+                    <p>ขอให้ทุกนาทีของวันนี้พิเศษกว่าทุกวันที่ผ่านมา</p>
+                    <p>ขอให้หัวใจของคุณอบอุ่นด้วยความรักและกำลังใจเสมอ</p>
+                    <p>และไม่ว่าจะมีอะไรเกิดขึ้น ฉันจะอยู่ตรงนี้ข้าง ๆ คุณ</p>
+                </div>
+            `);
+        });
+
+        btnLove.addEventListener('click', ()=>{
+            openModal('💖 รักนะ', `
+                <div style="font-size:18px;">
+                    <p style="margin:0 0 6px;">ฉันรักคุณมากกว่าที่คำพูดจะบรรยายได้</p>
+                    <p style="margin:0 0 6px;">ขอบคุณที่เข้ามาเติมเต็มชีวิตของฉัน</p>
+                    <p style="margin:0;">วันนี้เป็นของคุณ และหัวใจของฉันก็เป็นของคุณเช่นกัน</p>
+                </div>
+            `);
+        });
+
+        btnMemory.addEventListener('click', ()=>{
+            openModal('✨ ความทรงจำดี ๆ', `
+                <ul style="text-align:left; line-height:1.7; margin:0; padding-left:20px;">
+                    <li>ครั้งแรกที่เราเจอกัน — ยังจำรอยยิ้มของคุณได้ดี</li>
+                    <li>ทริปสั้น ๆ ที่กลายเป็นเรื่องเล่าที่ยาวนาน</li>
+                    <li>ข้อความสั้น ๆ ที่ทำให้ทั้งวันสดใส</li>
+                </ul>
+            `);
+        });
+
+        btnConfetti.addEventListener('click', ()=> fireConfetti(220));
+    </script>
+</body>
+</html>
+
+
